@@ -29,19 +29,19 @@ class PageController extends Controller
        return $this->blogRepo->index($request);
     }
 
-    public function category(Category $category, $slug) : View | RedirectResponse
+    public function category(Category $category, $slug, Request $request) : View | RedirectResponse
     {
-        return $this->categoryRepo->postsCategory($category, $slug);
+        return $this->categoryRepo->postsCategory($category, $slug, $request);
     }
 
-    public function tag(Tag $tag, $slug): View | RedirectResponse
+    public function tag(Tag $tag, $slug, Request $request): View | RedirectResponse
     {
-        return $this->tagRepo->postsTag($tag, $slug);
+        return $this->tagRepo->postsTag($tag, $slug, $request);
     }
 
-    public function userPost(User $user, $slug) : RedirectResponse | View
+    public function userPost(User $user, $slug, Request $request) : RedirectResponse | View
     {
-        return $this->userPostRepo->postsByUser($user, $slug);
+        return $this->userPostRepo->postsByUser($user, $slug, $request);
     }
 
 }

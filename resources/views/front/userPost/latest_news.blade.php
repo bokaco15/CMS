@@ -12,11 +12,11 @@
                         </div><a href="{{route('front.post.index', ['post'=>$post->id, 'slug'=>$post->slug])}}">
                             <h3 class="h4">{{$post->heading}}</h3></a>
                         <p class="text-muted">{{\Illuminate\Support\Str::words($post->preheading, 10, '....')}}</p>
-                        <footer class="post-footer d-flex align-items-center"><a href="blog-author.html" class="author d-flex align-items-center flex-wrap">
+                        <footer class="post-footer d-flex align-items-center"><a href="{{route('front.user.post', ['user'=>$user->id, 'slug'=>$user->slug])}}" class="author d-flex align-items-center flex-wrap">
                                 <div class="avatar"><img src="/storage/images/avatars/{{$post->user->id}}.webp" class="img-fluid"></div>
                                 <div class="title"><span>{{$post->user->name}}</span></div></a>
                             <div class="date"><i class="icon-clock"></i> {{$post->created_at->diffForHumans()}}</div>
-                            <div class="comments meta-last"><i class="icon-comment"></i>12</div>
+                            <div class="comments meta-last"><i class="icon-comment"></i>{{$post->comments->count()}}</div>
                         </footer>
                     </div>
                 </div>

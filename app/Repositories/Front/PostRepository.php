@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
@@ -44,7 +45,11 @@ class PostRepository
             ->orderBy('id', 'asc')
             ->first();
 
-        $comments = $post->comments()->where('status', 1)->orderBy('created_at', 'desc')->get();
+        $cacheKey = "comments.post.{$post->id}";
+
+        $comments = Cache::remember($cacheKey, 86400, function () use ($post) {
+            return $post->comments()->where('status', 1)->orderBy('created_at', 'desc')->get();
+        });
 
         return view('front.post.index', compact('post', 'prevPost', 'nextPost', 'comments'));
     }

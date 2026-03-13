@@ -7,17 +7,26 @@ use Illuminate\Support\Facades\Cache;
 
 class PostObserver
 {
-    protected function clearPostCache()
+    protected function clearPostCache(Post $post) : void
     {
         Cache::forget('posts.important');
         Cache::forget('posts.latest');
+        Cache::forget('posts.footer');
+        Cache::tags(['posts.blog'])->flush();
+        if ($post->category->id) {
+            Cache::tags(["category.{$post->category->id}"])->flush();
+        }
+        if ($post->user->id) {
+            Cache::tags(["posts.userid.{$post->user->id}"])->flush();
+        }
     }
+
     /**
      * Handle the Post "created" event.
      */
     public function created(Post $post): void
     {
-        $this->clearPostCache();
+        $this->clearPostCache($post);
     }
 
     /**
@@ -25,7 +34,10 @@ class PostObserver
      */
     public function updated(Post $post): void
     {
-        $this->clearPostCache();
+        if($post->wasChanged('views')) {
+            return;
+        }
+        $this->clearPostCache($post);
     }
 
     /**
@@ -33,7 +45,8 @@ class PostObserver
      */
     public function deleted(Post $post): void
     {
-        $this->clearPostCache();
+        $this->clearPostCache($post);
+        Cache::forget("comments.post.{$post->id}");
     }
 
     /**
@@ -41,7 +54,8 @@ class PostObserver
      */
     public function restored(Post $post): void
     {
-        $this->clearPostCache();
+        $this->clearPostCache($post);
+        Cache::forget("comments.post.{$post->id}");
     }
 
     /**
@@ -49,6 +63,7 @@ class PostObserver
      */
     public function forceDeleted(Post $post): void
     {
-        $this->clearPostCache();
+        $this->clearPostCache($post);
+        Cache::forget("comments.post.{$post->id}");
     }
 }

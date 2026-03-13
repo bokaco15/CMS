@@ -3,26 +3,32 @@
 namespace App\Repositories\Front;
 
 use App\Models\Post;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class BlogRepository
 {
-    public function index($request) : View
+    public function index(Request $request) : View
     {
-        if($request->isMethod('get')) {
-            $request->validate(['search' => 'nullable|string']);
-        }
-        $search = $request->search;
+        $search = $request->query('search');
+        $page = $request->query('page', 1);
 
-        $query = Post::where('published', 1);
+        $cacheKey = "posts.blog.search.{$search}.page.{$page}";
 
-        if ($search) {
-            $query->where('heading', 'like', "%{$search}%");
-        }
+        $posts = Cache::tags(['posts.blog'])->remember($cacheKey, 86000, function () use ($search) {
+            $query = Post::published();
 
-        $posts = $query->orderBy('created_at', 'desc')
-            ->paginate(4)
-            ->appends(['search' => $search]);
+            if ($search) {
+                $query->where('heading', 'like', "%{$search}%");
+            }
+
+            return $query->orderByLatestDate()
+                ->paginate(4);
+        });
+
+        $posts->appends(['search' => $search]);
+
         return view('front.blog._index', compact('posts'));
     }
 }

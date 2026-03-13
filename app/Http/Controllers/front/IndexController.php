@@ -15,22 +15,22 @@ class IndexController extends Controller
     public function index(): View
     {
         $importantPosts = Cache::remember('posts.important', 86000, function () {
-            Post::where('published', 1)
-                ->where('important', 1)
-                ->orderBy('created_at', 'desc')
+            return Post::published()
+                ->important() // Dodao sam ovo jer su ovo "važni" postovi
+                ->orderByLatestDate()
                 ->limit(3)
                 ->get();
         });
 
         $latestPosts = Cache::remember('posts.latest', 86000, function () {
-            Post::where('published', 1)
-                ->orderBy('created_at', 'desc')
+            return Post::published()
+                ->orderByLatestDate()
                 ->limit(12)
                 ->get();
         });
 
         $sliders = Cache::remember('sliders', 86000, function () {
-            Slider::orderBy('priority', 'asc')->get();
+            return Slider::orderBy('priority', 'asc')->get();
         });
 
 

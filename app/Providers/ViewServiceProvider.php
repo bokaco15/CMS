@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -25,16 +26,28 @@ class ViewServiceProvider extends ServiceProvider
     {
 
         View::composer('front._layout.footer', function($view) {
-            $view->with('footerCategory', Category::where('show_on_index', 1)->orderBy('priority')->limit(4)->get());
+            $footerCategories = Cache::remember('categories.footer', 86400, function() {
+                return Category::published()->orderByPriority()->limit(4)->get();
+            });
+            $view->with('footerCategory', $footerCategories);
         });
         View::composer(['front._layout.footer', 'front.blog.aside', 'front.contact.aside'], function($view) {
-            $view->with('latestFooterPosts', Post::where('published', 1)->orderBy('created_at', 'desc')->limit(3)->get());
+            $footerPosts = Cache::remember('posts.footer', 86400, function() {
+                return Post::published()->orderByLatestDate()->limit(3)->get();
+            });
+            $view->with('latestFooterPosts', $footerPosts);
         });
         View::composer('front.blog.aside', function($view) {
-            $view->with('asideCategories', Category::where('show_on_index', 1)->orderBy('priority')->limit(5)->get());
+            $categoriesAside = Cache::remember('categories.aside', 86400, function() {
+                return Category::published()->orderByPriority()->limit(5)->get();
+            });
+            $view->with('asideCategories', $categoriesAside);
         });
         View::composer('front.blog.aside', function($view) {
-            $view->with('tags', Tag::inRandomOrder()->limit(5)->get());
+            $asideTags = Cache::remember('tags.aside', 86400, function() {
+                return Tag::inRandomOrder()->limit(5)->get();
+            });
+            $view->with('tags', $asideTags);
         });
     }
 }

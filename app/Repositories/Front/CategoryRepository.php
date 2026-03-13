@@ -3,12 +3,14 @@
 namespace App\Repositories\Front;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class CategoryRepository
 {
-    public function postsCategory($category, $slug) : View | RedirectResponse
+    public function postsCategory($category, $slug, $request) : View | RedirectResponse
     {
         if ($slug !== $category->slug)
         {
@@ -22,10 +24,18 @@ class CategoryRepository
             abort(403, 'Unauthorized action.');
         }
 
-        $posts = $category->post()
-            ->where('published', 1)
-            ->orderBy('created_at', 'desc')
-            ->paginate(4);
+        $page = $request->query('page', 1);
+        $cacheKey = "category.{$category->id}.page.{$page}";
+
+        $posts = Cache::tags(["category.{$category->id}"])
+            ->remember($cacheKey, 86400, function () use ($category) {
+                return $category->post()
+                    ->published()
+                    ->orderByLatestDate()
+                    ->paginate(4);
+            });
+
+        $posts->withQueryString();
 
         return view('front.category.index', compact('posts', 'category'));
     }

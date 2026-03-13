@@ -5,8 +5,12 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Profile\UpdatePasswordRequest;
 use App\Http\Requests\Admin\Profile\UpdateProfileRequest;
+use App\Models\Category;
+use App\Models\Comment;
+use App\Models\Post;
 use App\Models\User;
 use App\Traits\AvatarPhoto;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -20,7 +24,13 @@ class AdminController extends Controller
     use AvatarPhoto;
     public function index():View
     {
-        return view('admin.index._index');
+        $postsCount = Post::all()->count();
+        $unreadComments = Comment::where('status', 0)->count();
+        $activeCategories = Category::where('show_on_index', 1)->count();
+        $postThisWeek = Post::where('created_at', '>=', now()->startOfWeek())->count();
+        $latestFivePosts = Post::latest()->take(5)->get();
+
+        return view('admin.index._index', compact('postsCount', 'latestFivePosts','postThisWeek', 'activeCategories', 'unreadComments'));
     }
 
     public function editPassword():View
