@@ -18,15 +18,17 @@
                                 <div class="post-details">
                                     <div class="post-meta d-flex justify-content-between">
                                         <div class="date meta-last">{{$post->created_at->format('d F | Y') }}</div>
-                                        <div class="category"><a href="blog-category.html">{{$post->category->name}}</a></div>
+                                        <div class="category"><a href="{{$category->show_on_index == 0 ? "" : route('front.category.index', ['category' => $category->id, 'slug' => $category->slug])}}">{{$post->category->name}}</a></div>
                                     </div><a href="{{route('front.post.index', ['post'=>$post->id, 'slug'=>$post->slug])}}">
                                         <h3 class="h4">{{$post->heading}}</h3></a>
                                     <p class="text-muted">{{\Illuminate\Support\Str::words($post->preheading, 10, '....')}}</p>
-                                    <footer class="post-footer d-flex align-items-center"><a href="blog-author.html" class="author d-flex align-items-center flex-wrap">
+                                    <footer class="post-footer d-flex align-items-center"><a href="{{route('front.user.post', ['user'=>$post->user->id, 'slug'=>$post->user->slug])}}" class="author d-flex align-items-center flex-wrap">
                                             <div class="avatar"><img src="/storage/images/avatars/{{$post->user->id}}.webp" alt="user logo" class="img-fluid"></div>
                                             <div class="title"><span>{{$post->user->name}}</span></div></a>
                                         <div class="date"><i class="icon-clock"></i> {{$post->created_at->diffForHumans()}}</div>
-                                        <div class="comments meta-last"><i class="icon-comment"></i>{{count($post->comments)}}</div>
+                                        <div class="comments meta-last"><i class="icon-comment"></i>
+                                            {{$post->comments()->published()->count()}}
+                                        </div>
                                     </footer>
                                 </div>
                             </div>

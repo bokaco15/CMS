@@ -18,7 +18,9 @@
                                 <div class="avatar"><img src="/storage/images/avatars/{{$post->user->id}}.webp" class="img-fluid"></div>
                                 <div class="title"><span>{{$post->user->name}}</span></div></a>
                             <div class="date"><i class="icon-clock"></i> {{$post->created_at->diffForHumans()}}</div>
-                            <div class="comments meta-last"><i class="icon-comment"></i>{{count($post->comments)}}</div>
+                            <div class="comments meta-last"><i class="icon-comment"></i>
+                                {{$post->comments()->published()->count()}}
+                            </div>
                         </footer>
                     </div>
                 </div>

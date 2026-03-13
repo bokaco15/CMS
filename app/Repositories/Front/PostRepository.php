@@ -48,7 +48,7 @@ class PostRepository
         $cacheKey = "comments.post.{$post->id}";
 
         $comments = Cache::remember($cacheKey, 86400, function () use ($post) {
-            return $post->comments()->where('status', 1)->orderBy('created_at', 'desc')->get();
+            return $post->comments()->published()->orderBy('created_at', 'desc')->get();
         });
 
         return view('front.post.index', compact('post', 'prevPost', 'nextPost', 'comments'));

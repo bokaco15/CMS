@@ -22,7 +22,7 @@
                                     <div class="avatar"><img src="/storage/images/avatars/{{$importantPost->user->id}}.webp" class="img-fluid"></div>
                                     <div class="title"><span>{{$importantPost->user->name}}</span></div></a>
                                 <div class="date"><i class="icon-clock"></i> {{ $importantPost->created_at->diffForHumans() }}</div>
-                                <div class="comments"><i class="icon-comment"></i>{{$importantPost->comments()->where('status', 1)->count()}}</div>
+                                <div class="comments"><i class="icon-comment"></i>{{$importantPost->comments()->published()->count()}}</div>
                             </footer>
                         </div>
                     </div>

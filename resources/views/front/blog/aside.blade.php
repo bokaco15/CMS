@@ -23,7 +23,7 @@
                         <div class="title"><strong>{{$latestPost->heading}}</strong>
                             <div class="d-flex align-items-center">
                                 <div class="views"><i class="icon-eye"></i> {{$latestPost->views}}</div>
-                                <div class="comments"><i class="icon-comment"></i>{{$latestPost->comments()->where('status', 1)->count()}}</div>
+                                <div class="comments"><i class="icon-comment"></i>{{$latestPost->comments()->published()->count()}}</div>
                             </div>
                         </div>
                     </div>
